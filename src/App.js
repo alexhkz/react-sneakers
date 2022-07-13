@@ -33,7 +33,8 @@ function App() {
 						title={obj.title} 
 						price={obj.price} 
 						imageUrl={obj.imageUrl}
-						key={obj.id} />
+						key={obj.id} 
+						onClickBtn={() => console.log(obj)} />
 					))}
 			</div>
 

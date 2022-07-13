@@ -1,10 +1,13 @@
 import React from 'react';
 
-const Card = ({title, price, imageUrl}) => {
+import styles from './Card.module.scss';
+
+const Card = ({title, price, imageUrl, onClickBtn}) => {
+	
 	return (
 		<div>
-			<div className="card">
-				<div className="favorite">
+			<div className={styles.card}>
+				<div className={styles.favorite}>
 					<img src="/img/unliked.svg" alt="unliked" />
 				</div>
 				<img width={133} height={112} src={imageUrl} alt="sneakers1" />
@@ -14,7 +17,7 @@ const Card = ({title, price, imageUrl}) => {
 						<span>Цена:</span>
 						<b>{price}</b>
 					</div>
-					<button className="button">
+					<button className="button" onClick={onClickBtn}>
 						<img width={11} height={11} src="/img/plus.svg" alt="plus" />
 					</button>
 				</div>

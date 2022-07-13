@@ -1,15 +1,17 @@
 import React from 'react';
 
+import styles from './Drawer.module.scss';
+
 const Drawer = () => {
 	return (
 		<div>
-			<div className="drawer">
+			<div className={styles.drawer}>
 				<h2 className="d-flex justify-between mb-30">
 					Корзина
 					<img className="cu-p" src="/img/sneakers/btn-remove.svg" alt="remove" />
 				</h2>
 
-				<div className="items">
+				<div className={styles.items}>
 					<div className="cartItem d-flex align-center mb-20">
 						<div style={{backgroundImage: 'url(/img/sneakers/1.jpg)'}} className="cartItemImg">
 						</div>
