@@ -2,7 +2,7 @@ import React from 'react';
 
 import styles from './Header.module.scss';
 
-const Header = () => {
+const Header = ({onClickCart}) => {
 	return (
 		<div>
 			<header className="d-flex justify-between align-center p-40">
@@ -14,7 +14,7 @@ const Header = () => {
 					</div>
 				</div>
 				<ul className="d-flex">
-					<li className="mr-30">
+					<li onClick={onClickCart} className="mr-30 cu-p">
 						{/* если нам нужно будет изменять цвет свг, то лучше сделать через тэг svg и вставить кодом */}
 						<img width={18} height={18} alt="cart" src="/img/cart.svg" />
 						<span>1205 руб.</span>

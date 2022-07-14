@@ -2,35 +2,29 @@ import React from 'react';
 
 import styles from './Drawer.module.scss';
 
-const Drawer = () => {
+const Drawer = ({onClose, items = []}) => {
 	return (
-		<div>
+		<div className={styles.overlay}>
 			<div className={styles.drawer}>
 				<h2 className="d-flex justify-between mb-30">
 					Корзина
-					<img className="cu-p" src="/img/sneakers/btn-remove.svg" alt="remove" />
+					<img onClick={onClose} className="cu-p" src="/img/btn-remove.svg" alt="close" />
 				</h2>
 
 				<div className={styles.items}>
-					<div className="cartItem d-flex align-center mb-20">
-						<div style={{backgroundImage: 'url(/img/sneakers/1.jpg)'}} className="cartItemImg">
-						</div>
-						<div className="mr-20 flex">
-							<p className="mb-5">Мужские кроссовки Nike Air Max 270</p>
-							<b>12 999 руб.</b>
-						</div>
-						<img className="removeBtn" src="/img/sneakers/btn-remove.svg" alt="remove" />
-					</div>
-
-					<div className="cartItem d-flex align-center">
-						<div style={{backgroundImage: 'url(/img/sneakers/1.jpg)'}} className="cartItemImg">
-						</div>
-						<div className="mr-20 flex">
-							<p className="mb-5">Мужские кроссовки Nike Air Max 270</p>
-							<b>12 999 руб.</b>
-						</div>
-						<img className="removeBtn" src="/img/sneakers/btn-remove.svg" alt="remove" />
-					</div>
+					{items.map((obj) => (
+							<div className="cartItem d-flex align-center mb-20">
+								<div 
+									style={{backgroundImage: `url(${obj.imageUrl})`}} 
+									className="cartItemImg">
+								</div>
+							<div className="mr-20 flex">
+								<p className="mb-5">{obj.title}</p>
+								<b>{obj.price}.</b>
+							</div>
+								<img className="removeBtn" src="/img/btn-remove.svg" alt="remove" />
+							</div>
+						))}
 				</div>
 
 				<div className="cartTotalBlock">
