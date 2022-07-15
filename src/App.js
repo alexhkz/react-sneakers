@@ -1,57 +1,90 @@
 import { useEffect, useState } from "react";
+import { Routes, Route } from 'react-router-dom';
+import axios from "axios";
 
-import Card from "./components/Card";
 import Drawer from "./components/Drawer";
 import Header from "./components/Header";
-
-
+import Home from "./pages/Home";
+import Favorites from "./pages/Favorites";
 
 function App() {
 	const [items, setItems] = useState([]);
 	const [cartItems, setCartItems] = useState([]);
+	const [favorites, setFavorites] = useState([]);
+	const [searchValue, setSearchValue] = useState('');
 	const [cartOpened, setCartOpened] = useState(false);
 
+	// при первом рендере отправляем запрос на получение кроссов и параллельно запрос на получение корзины
 	useEffect(() => {
-		fetch('https://62d01d38d9bf9f170583ae53.mockapi.io/items')
-		.then(res => {
-			return res.json();
+		axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/items').then((res) => {
+			setItems(res.data)
 		})
-		.then((data) => {
-			setItems(data)
-		});
+		axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/cart').then((res) => {
+			// сохраняем в cartItems
+			setCartItems(res.data)
+		})
+		axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/favorites').then((res) => {
+			setFavorites(res.data)
+		})
 	}, []);
 
-	const onAddToCard = (obj) => {
+	
+	const onAddToCart = (obj) => {
+		// отправляем наши данные (в корзине) на сервер
+		axios.post('https://62d01d38d9bf9f170583ae53.mockapi.io/cart', obj)
+		// передаём сначала предыдущие пропсы и сохраняем в стейте
 		setCartItems((prev) => [...prev, obj]);
+	}
+
+	const onRemoveItem = (id) => {
+		axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/cart/${id}`)
+		setCartItems((prev) => prev.filter(item => item.id !== id));
+	}
+
+	// если в массиве фаворитов такой же айди, как в нажатом при клике - отправляем запрос на удаление с айди
+	const onAddToFavorite = async (obj) => {
+		try {
+			if (favorites.find(favObj => favObj.id === obj.id)) {
+				axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/favorites/${obj.id}`)
+			} else {
+				// если похожий айди не нашёлся отправляем запрос на создание и сохраняем объект в стейт
+				// деструктуризируем респонс и передаём дальше
+				const {data} = await axios.post(`https://62d01d38d9bf9f170583ae53.mockapi.io/favorites`, obj)
+				setFavorites((prev) => [...prev, data]);
+			}
+		} catch (error) {
+			alert('Не удалось добавить в фавориты')
+		}
+	}
+
+	const onChangeSearchInput = (e) => {
+		setSearchValue(e.target.value)
 	}
 
   return (
     <div className="wrapper clear">
-		{/* используем && вметсо тернарного оператора и null */}
-		{cartOpened && <Drawer items={cartItems} onClose={() => setCartOpened(false)} />}
-		<Header onClickCart={() => setCartOpened(true)} />
-		<div className="content p-40">
-			<div className="d-flex align-center justify-between mb-40">
-				<h1>Все кроссовки</h1>
-				<div className="search-block d-flex">
-					<img src="/img/search.svg" alt="search" />
-					<input placeholder="Поиск..." />
-				</div>
-			</div>
-			
-			<div className="d-flex flex-wrap">
-				{items.map((item) => (
-					<Card 
-						title={item.title} 
-						price={item.price} 
-						imageUrl={item.imageUrl}
-						key={item.id} 
-						onClickFavorite={() => console.log('Add to bookmark')}
-						onClickPlus={(obj) => onAddToCard(obj)} />
-					))}
-			</div>
 
-		</div>
+		{/* используем && вместо тернарного оператора и null */}
+		{cartOpened && <Drawer 
+			items={cartItems} 
+			onClose={() => setCartOpened(false)} 
+			onRemove={onRemoveItem} />}
+			
+			<Header onClickCart={() => setCartOpened(true)} />
+		<Routes>
+ 			<Route  path="/"  
+				element={<Home 
+					items={items}
+					searchValue={searchValue}
+					setSearchValue={setSearchValue}
+					onChangeSearchInput={onChangeSearchInput}
+					onAddToCart={onAddToCart}
+					onAddToFavorite={onAddToFavorite}  />} /> 
+			<Route  path="/favorites"  
+				element={<Favorites 
+					items={favorites}
+					onAddToFavorite={onAddToFavorite} />} />                  
+      </Routes>
     </div>
   );
 }
