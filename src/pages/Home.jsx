@@ -2,7 +2,25 @@ import React from 'react';
 
 import Card from "../components/Card";
 
-const Home = ({items, searchValue, setSearchValue, onChangeSearchInput, onAddToCart, onAddToFavorite}) => {
+const Home = ({items, searchValue, setSearchValue, onChangeSearchInput, onAddToCart, onAddToFavorite, cartItems, isLoading}) => {
+
+	const renderItems = () => {
+		// проходимся по массиву и исключаем айтемы, у которых тайтл не соответвует тому, что в поиске
+		const filteredItems = items.filter((item) => item.title.toLowerCase().includes(searchValue.toLowerCase()))
+
+		return (isLoading 
+			? [...Array(8)] 
+			: filteredItems).map((item, index) => (
+				<Card 
+					key={index} 
+					onFavorite={(obj) => onAddToFavorite(obj)}
+					onClickPlus={(obj) => onAddToCart(obj)}
+					added={cartItems.some(obj => Number(obj.id) === Number(item.id))}
+					loading={isLoading}
+					{...item} />
+				))
+	}
+	
 	return (
 		<div className="content p-40">
 			<div className="d-flex align-center justify-between mb-40">
@@ -21,16 +39,7 @@ const Home = ({items, searchValue, setSearchValue, onChangeSearchInput, onAddToC
 			</div>
 			
 			<div className="d-flex flex-wrap">
-				{items
-					// проходимся по массиву и исключаем айтемы, у которых тайтл не соответвует тому, что в поиске
-					.filter(item => item.title.toLowerCase().includes(searchValue.toLowerCase()))
-					.map((item) => (
-						<Card 
-							key={item.id} 
-							onFavorite={(obj) => onAddToFavorite(obj)}
-							onClickPlus={(obj) => onAddToCart(obj)}
-							{...item} />
-						))}
+				{renderItems()}
 			</div>
 		</div>
 	);
