@@ -6,6 +6,7 @@ import Drawer from "./components/Drawer";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
+import AppContext from "./context";
 
 function App() {
 	const [items, setItems] = useState([]);
@@ -71,33 +72,38 @@ function App() {
 		setSearchValue(e.target.value)
 	}
 
-  return (
-    <div className="wrapper clear">
+	const isItemAdded = (id) => {
+		cartItems.some((obj) => Number(obj.id) === Number(id))
+	}
 
-		{/* используем && вместо тернарного оператора и null */}
-		{cartOpened && <Drawer 
-			items={cartItems} 
-			onClose={() => setCartOpened(false)} 
-			onRemove={onRemoveItem} />}
-			
-			<Header onClickCart={() => setCartOpened(true)} />
-		<Routes>
- 			<Route  path="/"  
-				element={<Home 
-					items={items}
-					cartItems={cartItems}
-					searchValue={searchValue}
-					setSearchValue={setSearchValue}
-					onChangeSearchInput={onChangeSearchInput}
-					onAddToCart={onAddToCart}
-					onAddToFavorite={onAddToFavorite}  />}
-					isLoading={isLoading} /> 
-			<Route  path="/favorites"  
-				element={<Favorites 
-					items={favorites}
-					onAddToFavorite={onAddToFavorite} />} />                  
-      </Routes>
-    </div>
+  return (
+	<AppContext.Provider value={{items, cartItems, favorites, isItemAdded }}>
+		<div className="wrapper clear">
+			{/* используем && вместо тернарного оператора и null */}
+			{cartOpened && <Drawer 
+				items={cartItems} 
+				onClose={() => setCartOpened(false)} 
+				onRemove={onRemoveItem} />}
+				
+				<Header onClickCart={() => setCartOpened(true)} />
+			<Routes>
+				<Route  path="/"  
+					element={<Home 
+						items={items}
+						cartItems={cartItems}
+						searchValue={searchValue}
+						setSearchValue={setSearchValue}
+						onChangeSearchInput={onChangeSearchInput}
+						onAddToCart={onAddToCart}
+						onAddToFavorite={onAddToFavorite} 
+						isLoading={isLoading}  />}
+						/> 
+				<Route  path="/favorites"  
+					element={<Favorites 
+						onAddToFavorite={onAddToFavorite} />} />                  
+			</Routes>
+		</div>
+	</AppContext.Provider>
   );
 }
 

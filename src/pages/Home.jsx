@@ -1,8 +1,15 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import Card from "../components/Card";
 
-const Home = ({items, searchValue, setSearchValue, onChangeSearchInput, onAddToCart, onAddToFavorite, cartItems, isLoading}) => {
+const Home = ({
+	items, 
+	searchValue, 
+	setSearchValue, 
+	onChangeSearchInput, 
+	onAddToCart, 
+	onAddToFavorite, 
+	isLoading}) => {
 
 	const renderItems = () => {
 		// проходимся по массиву и исключаем айтемы, у которых тайтл не соответвует тому, что в поиске
@@ -15,7 +22,6 @@ const Home = ({items, searchValue, setSearchValue, onChangeSearchInput, onAddToC
 					key={index} 
 					onFavorite={(obj) => onAddToFavorite(obj)}
 					onClickPlus={(obj) => onAddToCart(obj)}
-					added={cartItems.some(obj => Number(obj.id) === Number(item.id))}
 					loading={isLoading}
 					{...item} />
 				))
