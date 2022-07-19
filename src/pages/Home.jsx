@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 
 import Card from "../components/Card";
 
@@ -7,9 +7,10 @@ const Home = ({
 	searchValue, 
 	setSearchValue, 
 	onChangeSearchInput, 
-	onAddToCart, 
 	onAddToFavorite, 
-	isLoading}) => {
+	onAddToCart, 
+	isLoading
+}) => {
 
 	const renderItems = () => {
 		// проходимся по массиву и исключаем айтемы, у которых тайтл не соответвует тому, что в поиске
