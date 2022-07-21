@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../hooks/useCart';
 
 const Header = ({onClickCart}) => {
+	const { totalPrice } = useCart();
+
 	return (
 		<div>
 			<header className="d-flex justify-between align-center p-40">
@@ -18,7 +21,7 @@ const Header = ({onClickCart}) => {
 					<li onClick={onClickCart} className="mr-30 cu-p">
 						{/* если нам нужно будет изменять цвет свг, то лучше сделать через тэг svg и вставить кодом */}
 						<img width={18} height={18} alt="cart" src="/img/cart.svg" />
-						<span>1205 руб.</span>
+						<span>{totalPrice} руб.</span>
 					</li>
 					<li className="mr-20 cu-p">
 						<Link to='/favorites'>
@@ -26,8 +29,10 @@ const Header = ({onClickCart}) => {
 						</Link>
 					</li>
 					<li>
+						<Link to='/orders'>
+							<img className="mr-20 cu-p" width={18} height={18} alt="user" src="/img/user.svg" />
+						</Link>
 						{/* в данном случае нам не нужно подгружать каждый раз свг код и страница будет грузиться чуть быстрее */}
-						<img width={18} height={18} alt="user" src="/img/user.svg" />
 					</li>
 				</ul>
 			</header>
