@@ -20,14 +20,21 @@ function App() {
 	// при первом рендере отправляем запрос на получение кроссов и параллельно запрос на получение корзины
 	useEffect(() => {
 		async function fetchData() {
-			const cartsResponse = await axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/cart');
-			const favoritesResponse = await axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/favorites');
-			const itemsResponse = await axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/items');
+			try {
+				const [cartsResponse, favoritesResponse, itemsResponse] = await Promise.all([
+					axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/cart'), 
+					axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/favorites'), 
+					axios.get('https://62d01d38d9bf9f170583ae53.mockapi.io/items')
+				])
 
-			setIsLoading(false);
-			setCartItems(cartsResponse.data);
-			setFavorites(favoritesResponse.data);
-			setItems(itemsResponse.data);
+				setIsLoading(false);
+				setCartItems(cartsResponse.data);
+				setFavorites(favoritesResponse.data);
+				setItems(itemsResponse.data);
+			} catch (error) {
+				alert('Ошибка при запросе данных :(');
+				console.error(error);
+			}
 		}
 		fetchData();
 	}, []);
@@ -36,19 +43,39 @@ function App() {
 	// передаём сначала предыдущие пропсы и сохраняем в стейте
 	// если в корзине такой же элемент, как в obj.id, то исключаем из массива
 	// иначе создаем товар 
-	const onAddToCart = (obj) => {
-			if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
-				axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/cart/${obj.id}`)
-				setCartItems(prev => prev.filter((elem) => Number(elem.id) !== Number(obj.id)))
-			} else {
-				axios.post('https://62d01d38d9bf9f170583ae53.mockapi.io/cart', obj)
-				setCartItems((prev) => [...prev, obj]);
+	const onAddToCart = async (obj) => {
+		const findItem = cartItems.find((item) => Number(item.parentId) === Number(obj.id))
+			try {
+				if (findItem) {
+					setCartItems(prev => prev.filter((elem) => Number(elem.parentId) !== Number(obj.id)))
+					await axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/cart/${findItem.id}`)
+				} else {
+					setCartItems((prev) => [...prev, obj]);
+					const {data} = await axios.post('https://62d01d38d9bf9f170583ae53.mockapi.io/cart', obj)
+					setCartItems((prev) => prev.map(item => {
+						if (item.parentId === data.parentId) {
+							return {
+								...item,
+								id: data.id
+							};
+						}
+						return item;
+					}));
+				}
+			} catch (error) {
+				alert('Ошибка при добавлении в корзину');
+				console.error(error);
 			}
 	}
 
 	const onRemoveItem = (id) => {
-		axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/cart/${id}`)
-		setCartItems((prev) => prev.filter((item) => item.id !== id));
+		try {
+			axios.delete(`https://62d01d38d9bf9f170583ae53.mockapi.io/cart/${id}`)
+			setCartItems((prev) => prev.filter((item) => Number(item.id) !== Number(id)));
+		} catch (error) {
+			alert('Ошибка при удалении из корзины');
+			console.error(error);
+		}
 	}
 
 	// если в массиве фаворитов такой же айди, как в нажатом при клике - отправляем запрос на удаление с айди
@@ -64,7 +91,8 @@ function App() {
 				setFavorites((prev) => [...prev, data]);
 			}
 		} catch (error) {
-			alert('Не удалось добавить в фавориты')
+			alert('Не удалось добавить в фавориты');
+			console.error(error);
 		}
 	}
 
@@ -73,7 +101,7 @@ function App() {
 	}
 
 	const isItemAdded = (id) => {
-		return cartItems.some((obj) => Number(obj.id) === Number(id));
+		return cartItems.some((obj) => Number(obj.parentId) === Number(id));
 	}
 
   return (
